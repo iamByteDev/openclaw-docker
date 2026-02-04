@@ -1,20 +1,23 @@
-```yaml
+yaml
+version: "3.8"
+
 services:
-  gateway:
-    image: ghcr.io/openclaw/openclaw
-    env_file: ./gateway/.env
+  openclaw:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-remy
+    restart: unless-stopped
+    ports:
+      - "18789:18789"
     environment:
       HOME: /home/node
       TERM: xterm-256color
     volumes:
-      - ./volumes/config:/home/node/.openclaw
-      - ./volumes/workspace:/home/node/openclaw
-      - ./volumes/storage:/home/node/storage
-      - ./volumes/files/.bashrc:/home/node/.bashrc
-      - ./volumes/files/.profile:/home/node/.profile
-      - ./volumes/files/.bash_aliases:/home/node/.bash_aliases
-    ports:
-      - "18789:18789"
+      - openclaw-config:/home/node/.openclaw
+      - openclaw-workspace:/home/node/openclaw
+      - openclaw-storage:/home/node/storage
     command: ["node", "dist/index.js", "gateway", "--bind", "0.0.0.0", "--port", "18789"]
-    restart: unless-stopped
-```
+
+volumes:
+  openclaw-config:
+  openclaw-workspace:
+  openclaw-storage:
