@@ -1,3 +1,4 @@
+
 services:
   tailscale:
     image: tailscale/tailscale:latest
@@ -15,7 +16,7 @@ services:
       - SYS_MODULE
     restart: unless-stopped
     networks:
-      - openclawd-network
+      - openclawd-network-remy  # CHANGED
 
   gateway:
     image: ghcr.io/openclaw/openclaw
@@ -35,8 +36,7 @@ services:
     depends_on:
       - tailscale
     network_mode: service:tailscale
-    command:
-      ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]
+    command: ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]
 
   browser:
     image: ghcr.io/iamevanyt/openclaw-sandbox-browser
@@ -45,18 +45,26 @@ services:
     volumes:
       - ./volumes/browser:/home/openclaw-browser/.chrome
     expose:
-      - "9222:9222"
-      - "5900:5900"
+      - "9222"      # CHANGED - no mapping needed
+      - "5900"      # CHANGED - no mapping needed
     ports:
-      - "6080:6080"
+      - "6080:6080" # CHANGED - double quotes
     restart: unless-stopped
     networks:
-      openclawd-network:
-        ipv4_address: 172.20.0.10
+      - openclawd-network-remy  # CHANGED
 
 networks:
-  openclawd-network:
+  openclawd-network-remy:  # CHANGED
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/24
+        - subnet: 172.21.0.0/24  # CHANGED - different subnet
+```
+
+**Changes made:**
+- Network name: `openclawd-network-remy`
+- Subnet: `172.21.0.0/24` (was `172.20.0.0/24`)
+- Ports quoted with double quotes `"6080:6080"`
+- Browser expose simplified
+
+Copy this and commit! 🦉
