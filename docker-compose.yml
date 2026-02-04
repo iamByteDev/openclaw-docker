@@ -45,10 +45,10 @@ services:
     volumes:
       - ./volumes/browser:/home/openclaw-browser/.chrome
     expose:
-      - 9222:9222
-      - 5900:5900
+      - "9222:9222"
+      - "5900:5900"
     ports:
-      - 6080:6080
+      - "6080:6080"
     restart: unless-stopped
     networks:
       openclawd-network:
