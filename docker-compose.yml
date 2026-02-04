@@ -1,25 +1,5 @@
-
+```yaml
 services:
-  tailscale:
-    image: tailscale/tailscale:latest
-    hostname: openclawd
-    env_file: ./tailscale/.env
-    environment:
-      TS_STATE_DIR: /var/lib/tailscale
-      TS_USERSPACE: false
-      TS_SERVE_CONFIG: /var/lib/tailscale/config/serve.json
-    volumes:
-      - ./volumes/tailscale:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    restart: unless-stopped
-    networks:
-      - openclawd-network-remy
-    labels:
-      - "coolify.service=tailscale"
-
   gateway:
     image: ghcr.io/openclaw/openclaw
     env_file: ./gateway/.env
@@ -33,48 +13,8 @@ services:
       - ./volumes/files/.bashrc:/home/node/.bashrc
       - ./volumes/files/.profile:/home/node/.profile
       - ./volumes/files/.bash_aliases:/home/node/.bash_aliases
-    init: true
-    restart: unless-stopped
-    depends_on:
-      - tailscale
-    network_mode: service:tailscale
-    command:
-      ["node", "dist/index.js", "gateway", "--bind", "lan", "--port", "18789"]
-    labels:
-      - "coolify.service=gateway"
-      - "coolify.port=18789"
-      - "coolify.deploy=true"
-
-  browser:
-    image: ghcr.io/iamevanyt/openclaw-sandbox-browser
-    hostname: openclaw-browser
-    shm_size: 2gb
-    volumes:
-      - ./volumes/browser:/home/openclaw-browser/.chrome
-    expose:
-      - "9222"
-      - "5900"
     ports:
-      - "6080:6080"
+      - "18789:18789"
+    command: ["node", "dist/index.js", "gateway", "--bind", "0.0.0.0", "--port", "18789"]
     restart: unless-stopped
-    networks:
-      - openclawd-network-remy
-    labels:
-      - "coolify.service=browser"
-
-networks:
-  openclawd-network-remy:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/24
 ```
-
-**Changes:**
-- ✅ All ports quoted with `"`
-- ✅ Network renamed to `openclawd-network-remy`
-- ✅ Subnet changed to `172.21.0.0/24`
-- ✅ Added Coolify labels
-- ✅ Fixed browser expose format
-
-**Paste this into your forked repo's `docker-compose.yml`, commit, and redeploy!** 🦉
